@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"os"
+	"sso/internal/app"
 	"sso/internal/config"
 	"sso/internal/lib/logger/slogpretty"
 )
@@ -17,15 +18,21 @@ func main() { // точка входа в приложение
 	// TODO : init config'
 
 	cfg := config.MustLoad()
-	_ = cfg
+
+	// TODO : init logger
 
 	log := setupLogger(cfg.Env)
+	log = log.With(
+		slog.String("env", cfg.Env),
+	)
 
-	log.Debug("cfd is successfully load", slog.String("CONFIG_PATH", os.Getenv("CONFIG_PATH")))
-	// TODO : init logger
+	log.Debug("cfg is successfully load", slog.String("config_path", os.Getenv("CONFIG_PATH")))
 
 	// TODO : init app
 
+	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL)
+
+	application.GRPCSrv.MustRun()
 	// TODO : lounch gRPC-server
 }
 
