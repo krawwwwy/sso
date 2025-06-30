@@ -1,4 +1,4 @@
-package login
+package register
 
 import (
 	"fmt"
@@ -8,22 +8,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const emptyValue = 0
-
-func ValidationError(req *ssov1.LoginRequest) error {
+func ValidationError(req *ssov1.RegisterRequest) error {
 	email := req.GetEmail()
 	password := req.GetPassword()
-	app_id := req.GetAppid()
 
 	for _, field := range []string{email, password} {
 		if field == "" {
 			return status.Error(codes.InvalidArgument, fmt.Sprintf("%s is required", field))
 		}
 	}
-
-	if app_id == emptyValue {
-		return status.Error(codes.InvalidArgument, "app_id is required")
-	}
-
 	return nil
 }
