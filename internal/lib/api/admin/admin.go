@@ -3,7 +3,7 @@ package admin
 import (
 	ssov1 "github.com/krawwwwy/protos/gen/go/sso"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/internal/status"
+	"google.golang.org/grpc/status"
 )
 
 const emptyValue = 0
