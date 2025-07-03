@@ -1,7 +1,16 @@
 version : "3"
 
 tasks:
-  migrate:
+  migrate_up:
+    aliases: 
+    - "mUp"
     desc: "Start migrations"
     cmds:
       -  go run ./cmd/migrator/ --storage-path=./storage/sso.db --migrations-path=./migrations
+
+  migrate_down:
+    aliases:
+    - "mDown"
+    desc: "Rollback migrations"
+    cmds:
+      -  go run ./cmd/migrator/ --storage-path=./storage/sso.db --migrations-path=./migrations --down
