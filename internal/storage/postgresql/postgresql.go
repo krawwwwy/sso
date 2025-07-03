@@ -9,7 +9,6 @@ import (
 	"sso/internal/storage"
 
 	"github.com/lib/pq"
-	_ "github.com/lib/pq" // драйвер для PostgreSQL
 )
 
 type Storage struct {
@@ -39,22 +38,18 @@ func New(storagePath string) (*Storage, error) {
 func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (int64, error) {
 	const op = "storage.postgresql.SaveUser"
 
-	stmt, err := s.db.Prepare("INSERT INTO users(email, pass_hash) VALUES($1, $2) RETURNING id")
-	if err != nil {
-		return emptyID, fmt.Errorf("%s: %w", op, err)
-	}
-
-	res, err := stmt.ExecContext(ctx, email, passHash)
+	var id int64
+	err := s.db.QueryRowContext(
+		ctx,
+		"INSERT INTO users(email, pass_hash) VALUES($1, $2) RETURNING id",
+		email,
+		passHash,
+	).Scan(&id)
 
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
 			return emptyID, storage.ErrUserExists
 		}
-		return emptyID, fmt.Errorf("%s: %w", op, err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
 		return emptyID, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -86,8 +81,10 @@ func (s *Storage) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 	var isAdmin bool
 
 	err := s.db.QueryRowContext(ctx, "SELECT 1 FROM admins WHERE user_id = $1", userID).Scan(&isAdmin)
-
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+			return false, storage.ErrUserExists
+		}
 		return false, fmt.Errorf("%s: %w", op, err)
 	}
 
