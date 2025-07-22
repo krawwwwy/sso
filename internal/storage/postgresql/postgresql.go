@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"sso/internal/domain/models"
 	"sso/internal/storage"
 
@@ -35,9 +36,9 @@ func New(storagePath string) (*Storage, error) {
 }
 
 // SaveUser saves user by email and password and returns his id
-func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (int64, error) {
+func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte, role string) (int64, error) {
 	const op = "storage.postgresql.SaveUser"
-
+	log.Default().Println("role", role)
 	var id int64
 	err := s.db.QueryRowContext(
 		ctx,
@@ -45,12 +46,20 @@ func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (
 		email,
 		passHash,
 	).Scan(&id)
-
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
 			return emptyID, storage.ErrUserExists
 		}
 		return emptyID, fmt.Errorf("%s: %w", op, err)
+	}
+	fmt.Println(role)
+	if role == "admin" {
+		err = s.db.QueryRowContext(
+			ctx,
+			"INSERT INTO admins(user_id) VALUES($1)",
+			id,
+		).Err()
+		fmt.Println("err")
 	}
 
 	return id, nil
@@ -82,8 +91,8 @@ func (s *Storage) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 
 	err := s.db.QueryRowContext(ctx, "SELECT 1 FROM admins WHERE user_id = $1", userID).Scan(&isAdmin)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
-			return false, storage.ErrUserExists
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
 		}
 		return false, fmt.Errorf("%s: %w", op, err)
 	}

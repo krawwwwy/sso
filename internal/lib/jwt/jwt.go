@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"fmt"
 	"sso/internal/domain/models"
 	"time"
 
@@ -17,6 +18,7 @@ func NewToken(user models.User, app models.App, duration time.Duration) (string,
 	claims["app_id"] = app.ID
 	claims["exp"] = time.Now().Add(duration).Unix()
 
+	fmt.Println("Current time:", time.Now())
 	tokenString, err := token.SignedString([]byte(app.Secret))
 	if err != nil {
 		return "", err

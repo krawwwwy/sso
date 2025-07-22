@@ -26,6 +26,7 @@ type UserSaver interface {
 	SaveUser(ctx context.Context,
 		email string,
 		passHash []byte,
+		role string,
 	) (uid int64, err error)
 }
 
@@ -119,12 +120,14 @@ func (a *Auth) Login(ctx context.Context,
 func (a *Auth) RegisterNewUser(ctx context.Context,
 	email string,
 	password string,
+	role string,
 ) (userID int64, err error) {
 	const op = "auth.RegisterNewUser"
 
 	log := a.log.With(
 		slog.String("op", op),
 		slog.String("user_email", email),
+		slog.String("role", role),
 	)
 
 	log.Info("registering user")
@@ -136,7 +139,7 @@ func (a *Auth) RegisterNewUser(ctx context.Context,
 		return emptyID, fmt.Errorf("%s: %w", op, err)
 	}
 
-	id, err := a.userSaver.SaveUser(ctx, email, passHash)
+	id, err := a.userSaver.SaveUser(ctx, email, passHash, role)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserExists) {
 			log.Warn("user already exists", sl.Err(err))
@@ -175,7 +178,7 @@ func (a *Auth) IsAdmin(ctx context.Context,
 			return false, fmt.Errorf("%s: %w", op, ErrInvalidUserID)
 		}
 
-		log.Error("failed to check is user an admin")
+		log.Error("failed to check is user an admin", sl.Err(err))
 
 		return false, fmt.Errorf("%s: %w", op, err)
 	}
