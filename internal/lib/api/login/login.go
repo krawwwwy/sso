@@ -15,9 +15,12 @@ func ValidationError(req *ssov1.LoginRequest) error {
 	password := req.GetPassword()
 	app_id := req.GetAppid()
 
-	for _, field := range []string{email, password} {
+	list := []string{email, password}
+	dict := []string{"email", "password"}
+
+	for key, field := range list {
 		if field == "" {
-			return status.Error(codes.InvalidArgument, fmt.Sprintf("%s is required", field))
+			return status.Error(codes.InvalidArgument, fmt.Sprintf("%s is required", dict[key]))
 		}
 	}
 
