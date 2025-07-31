@@ -6,7 +6,6 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/golang-migrate/migrate/v4 v4.18.3
 	github.com/ilyakaznacheev/cleanenv v1.5.0
-	github.com/krawwwwy/protos/gen/go/sso v0.0.4
 	golang.org/x/crypto v0.39.0
 	google.golang.org/grpc v1.73.0
 )
@@ -14,12 +13,10 @@ require (
 require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/krawwwwy/rosatomprotos v0.0.1 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 )
-
-// Указываем Go использовать локальную версию модуля
-replace github.com/krawwwwy/protos/gen/go/sso => ../protos/gen/go/sso
 
 require (
 	github.com/BurntSushi/toml v1.5.0 // indirect
