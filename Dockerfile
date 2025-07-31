@@ -1,7 +1,4 @@
 FROM golang:1.24-alpine AS builder
-=======
-FROM golang:1.21-alpine AS builder
->>>>>>> 381994eea2fc54ef6f274240221f0099c08e4c65
 
 WORKDIR /app
 
@@ -15,11 +12,9 @@ COPY . .
 # Собираем бинарник
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o sso ./cmd/sso
 
-<<<<<<< HEAD
+
 FROM golang:1.24-alpine
-=======
-FROM golang:1.21-alpine
->>>>>>> 381994eea2fc54ef6f274240221f0099c08e4c65
+
 
 RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /app
