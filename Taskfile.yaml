@@ -1,7 +1,30 @@
 version : "3"
 
 tasks:
-  migrate:
+  sqlite_migrate_up:
+    aliases: 
+    - "SmUp"
     desc: "Start migrations"
     cmds:
-      -  go run ./cmd/migrator/ --storage-path=./storage/sso.db --migrations-path=./migrations
+      -  go run ./cmd/migrator/sqlite3/main.go --storage-path=./storage/sso.db --migrations-path=./migrations/sqlite
+
+  sqlite_migrate_down:
+    aliases:
+    - "SmDown"
+    desc: "Rollback migrations"
+    cmds:
+      -  go run ./cmd/migrator/sqlite3/main.go --storage-path=./storage/sso.db --migrations-path=./migrations/sqlite --down
+
+  postgres_migrate_up:
+    aliases:
+    - "PmUp"
+    desc: "Start migrations"
+    cmds:
+      -  go run ./cmd/migrator/postgres/main.go -migrations-path=./migrations/postgresql
+
+  postgres_migrate_down:
+    aliases:
+    - "PmDown"
+    desc: "Rollback migrations"
+    cmds:
+      -  go run ./cmd/migrator/postgres/main.go -migrations-path=./migrations/postgresql --down
