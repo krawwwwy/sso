@@ -1,0 +1,6 @@
+env: "prod"
+storage_path: "postgres://rosatom:rosatom@postgres:5432/rosatom?sslmode=disable"
+token_ttl: 24h
+grpc:
+  port: 44044
+  timeout: 10h 

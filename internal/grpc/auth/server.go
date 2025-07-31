@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sso/internal/lib/api/admin"
 	"sso/internal/lib/api/login"
 	"sso/internal/lib/api/register"
@@ -23,6 +24,7 @@ type Auth interface {
 	RegisterNewUser(ctx context.Context,
 		email string,
 		password string,
+		role string,
 	) (userID int64, err error)
 	IsAdmin(ctx context.Context,
 		userID int64,
@@ -62,8 +64,8 @@ func (s *serverAPI) Register(ctx context.Context, req *ssov1.RegisterRequest) (*
 	if err := register.ValidationError(req); err != nil {
 		return nil, err
 	}
-
-	userID, err := s.auth.RegisterNewUser(ctx, req.GetEmail(), req.GetPassword())
+	fmt.Println("Registering user with role:", req.GetRole(), "and email:", req.GetEmail())
+	userID, err := s.auth.RegisterNewUser(ctx, req.GetEmail(), req.GetPassword(), req.GetRole())
 	if err != nil {
 		if errors.Is(err, auth.ErrUserExists) {
 			return nil, status.Error(codes.AlreadyExists, "user already exists")

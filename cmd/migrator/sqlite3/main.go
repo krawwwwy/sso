@@ -12,10 +12,12 @@ import (
 
 func main() {
 	var storagePath, migrationsPath, migrationsTable string
+	var down bool
 
 	flag.StringVar(&storagePath, "storage-path", "", "path to storage")
 	flag.StringVar(&migrationsPath, "migrations-path", "", "path to migrations")
 	flag.StringVar(&migrationsTable, "migrations-table", "migrations", "name of migrations")
+	flag.BoolVar(&down, "down", false, "run down migrations")
 	flag.Parse()
 
 	for _, value := range []string{storagePath, migrationsPath, migrationsTable} {
@@ -32,15 +34,28 @@ func main() {
 		panic(err)
 	}
 
-	if err := m.Up(); err != nil {
-		if errors.Is(err, migrate.ErrNoChange) {
-			fmt.Println("no migrates to apply")
-
-			return
-		}
-
-		panic(err)
+	var migrationErr error
+	if down {
+		migrationErr = m.Down()
+	} else {
+		migrationErr = m.Up()
 	}
 
-	fmt.Println("migrations applied successfully")
+	if migrationErr != nil {
+		if errors.Is(migrationErr, migrate.ErrNoChange) {
+			if down {
+				fmt.Println("no migrations to rollback")
+			} else {
+				fmt.Println("no migrations to apply")
+			}
+			return
+		}
+		panic(migrationErr)
+	}
+
+	if down {
+		fmt.Println("migrations rolled back successfully")
+	} else {
+		fmt.Println("migrations applied successfully")
+	}
 }
