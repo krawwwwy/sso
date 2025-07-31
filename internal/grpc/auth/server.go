@@ -9,7 +9,7 @@ import (
 	"sso/internal/lib/api/register"
 	"sso/internal/service/auth"
 
-	ssov1 "github.com/krawwwwy/protos/gen/go/sso"
+	ssov1 "github.com/krawwwwy/rosatomprotos"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
