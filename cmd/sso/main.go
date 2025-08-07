@@ -49,18 +49,7 @@ func main() { // точка входа в приложение
 
 func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
-
-	switch env {
-	case envLocal:
-		log = setupPrettySlog(env)
-	case envDev:
-		log = slog.New(
-			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
-		)
-	case envProd:
-		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
-	}
-
+	log = setupPrettySlog(env)
 	return log
 
 }
